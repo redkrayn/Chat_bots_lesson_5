@@ -30,7 +30,9 @@ pip install -r requirements.txt
 2. `npm run develop`
 
 ## Настройка переменных окружения
-`STRAPI_TOKEN` - Гайд для получения токена [здесь](https://docs.strapi.io/cms/features/api-tokens#usage)
+`STRAPI_TOKEN` - Гайд для получения токена [здесь](https://docs.strapi.io/cms/features/api-tokens#usage)\
+
+`STRAPI_URL` - Url вашего магазина
 
 `TELEGRAM_BOT_TOKEN` - Для начала создайте бота в [телеграме](https://telegram.me/BotFather), после вам выдадут токен.
 
