@@ -323,11 +323,8 @@ def handle_users_reply(update, context):
     }
     state_handler = states_functions[user_state]
 
-    try:
-        next_state = state_handler(update, context)
-        db.set(chat_id, next_state)
-    except Exception as err:
-        print(err)
+    next_state = state_handler(update, context)
+    db.set(chat_id, next_state)
 
 
 if __name__ == '__main__':
@@ -356,12 +353,15 @@ if __name__ == '__main__':
     logger_name = 'tg_echo_bot'
     logger = setup_logging(logger_name, updater.bot, telegram_chat_id)
 
-    dp.add_handler(CallbackQueryHandler(handle_users_reply))
-    dp.add_handler(MessageHandler(Filters.text, handle_users_reply))
-    dp.add_handler(CommandHandler('start', handle_users_reply))
+    try:
+        dp.add_handler(CallbackQueryHandler(handle_users_reply))
+        dp.add_handler(MessageHandler(Filters.text, handle_users_reply))
+        dp.add_handler(CommandHandler('start', handle_users_reply))
 
-    logger.info('Бот запущен')
+        logger.info('Бот запущен')
 
-    updater.start_polling()
-    updater.idle()
+        updater.start_polling()
+        updater.idle()
 
+    except Exception as e:
+        logger.error(f'Бот упал с ошибкой: {e}', exc_info=True)
