@@ -19,10 +19,11 @@ def show_cart(update, context):
 
     chat_id = query.message.chat_id
     strapi_token = context.bot_data['strapi_token']
+    strapi_url = context.bot_data['strapi_url']
 
-    cart_id = get_or_create_cart(chat_id, strapi_token)
+    cart_id = get_or_create_cart(chat_id, strapi_token, strapi_url)
 
-    cart = get_cart_with_items(cart_id, strapi_token)
+    cart = get_cart_with_items(cart_id, strapi_token, strapi_url)
 
     if not cart['data']['attributes']['cart_items']['data']:
         message = 'В корзине пуфто...'
@@ -157,11 +158,12 @@ def handle_description(update, context):
     elif query.data == 'add_product':
         chat_id = query.message.chat_id
         strapi_token = context.bot_data['strapi_token']
+        strapi_url = context.bot_data['strapi_url']
 
-        cart_id = get_or_create_cart(chat_id, strapi_token)
+        cart_id = get_or_create_cart(chat_id, strapi_token, strapi_url)
         product_id = context.user_data.get('current_product_id')
 
-        add_product_to_cart(cart_id, product_id, strapi_token)
+        add_product_to_cart(cart_id, product_id, strapi_token, strapi_url)
         query.message.reply_text('Товар успешно добавлен в корзину!')
 
         return 'HANDLE_DESCRIPTION'
@@ -202,9 +204,10 @@ def handle_cart(update, context):
     if query.data == 'clear_cart':
         chat_id = query.message.chat_id
         strapi_token = context.bot_data['strapi_token']
+        strapi_url = context.bot_data['strapi_url']
 
         cart_id = get_or_create_cart(chat_id, strapi_token)
-        clear_cart(cart_id, strapi_token)
+        clear_cart(cart_id, strapi_token, strapi_url)
 
         query.delete_message()
         message = 'Корзина очищена!'
@@ -266,7 +269,8 @@ def handle_email(update, context):
         user_email = update.message.text.strip()
         chat_id = update.message.chat_id
         strapi_token = context.bot_data['strapi_token']
-        cart_id = get_or_create_cart(chat_id, strapi_token)
+        strapi_url = context.bot_data['strapi_url']
+        cart_id = get_or_create_cart(chat_id, strapi_token, strapi_url)
 
         email_pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 
@@ -339,12 +343,14 @@ if __name__ == '__main__':
     telegram_chat_id = env('TELEGRAM_CHAT_ID')
 
     strapi_token = env('STRAPI_TOKEN')
+    strapi_url = env('STRAPI_URL')
 
     updater = Updater(telegram_bot_token)
     dp = updater.dispatcher
 
+    dp.bot_data['strapi_url'] = strapi_url
     dp.bot_data['redis_db'] = launch_redis(redis_host, redis_port, redis_password, redis_db)
-    dp.bot_data['products'] = get_products(strapi_token)
+    dp.bot_data['products'] = get_products(strapi_token, strapi_url)
     dp.bot_data['strapi_token'] = strapi_token
 
     logger_name = 'tg_echo_bot'

@@ -1,7 +1,7 @@
 import requests
 
 
-def get_products(strapi_token):
+def get_products(strapi_token, strapi_url):
     headers = {
         'Authorization': f'Bearer {strapi_token}'
     }
@@ -9,7 +9,7 @@ def get_products(strapi_token):
         'populate': 'picture'
     }
     response = requests.get(
-        f'http://localhost:1337/api/products',
+        f'{strapi_url}/api/products',
         headers=headers,
         params=params
     )
@@ -18,7 +18,7 @@ def get_products(strapi_token):
     return response.json()
 
 
-def get_or_create_cart(chat_id, strapi_token):
+def get_or_create_cart(chat_id, strapi_token, strapi_url):
     headers = {
         'Authorization': f'Bearer {strapi_token}'
     }
@@ -29,7 +29,7 @@ def get_or_create_cart(chat_id, strapi_token):
     }
 
     response = requests.get(
-        'http://localhost:1337/api/carts',
+        f'{strapi_url}/api/carts',
         headers=headers,
         params=params
     )
@@ -41,7 +41,7 @@ def get_or_create_cart(chat_id, strapi_token):
         return carts['data'][0]['id']
 
     else:
-        cart_data = {
+        cart_payload = {
             'data': {
                 'chat_id': str(chat_id),
                 'cart_items': []
@@ -49,9 +49,9 @@ def get_or_create_cart(chat_id, strapi_token):
         }
 
         response = requests.post(
-            'http://localhost:1337/api/carts',
+            f'{strapi_url}/api/carts',
             headers=headers,
-            json=cart_data
+            json=cart_payload
         )
         response.raise_for_status()
 
@@ -59,12 +59,12 @@ def get_or_create_cart(chat_id, strapi_token):
         return cart['data']['id']
 
 
-def add_product_to_cart(cart_id, product_id, strapi_token):
+def add_product_to_cart(cart_id, product_id, strapi_token, strapi_url):
     headers = {
         'Authorization': f'Bearer {strapi_token}',
     }
 
-    cart_item_data = {
+    cart_item_payload = {
         'data': {
             'product': product_id,
             'cart': cart_id
@@ -72,16 +72,16 @@ def add_product_to_cart(cart_id, product_id, strapi_token):
     }
 
     response = requests.post(
-        'http://localhost:1337/api/cart-items',
+        f'{strapi_url}/api/cart-items',
         headers=headers,
-        json=cart_item_data
+        json=cart_item_payload
     )
     response.raise_for_status()
 
     return response.json()
 
 
-def get_cart_with_items(cart_id, strapi_token):
+def get_cart_with_items(cart_id, strapi_token, strapi_url):
     headers = {
         'Authorization': f'Bearer {strapi_token}'
     }
@@ -91,7 +91,7 @@ def get_cart_with_items(cart_id, strapi_token):
     }
 
     response = requests.get(
-        f'http://localhost:1337/api/carts/{cart_id}',
+        f'{strapi_url}/api/carts/{cart_id}',
         headers=headers,
         params=params
     )
@@ -100,7 +100,7 @@ def get_cart_with_items(cart_id, strapi_token):
     return response.json()
 
 
-def clear_cart(cart_id, strapi_token):
+def clear_cart(cart_id, strapi_token, strapi_url):
     cart = get_cart_with_items(cart_id, strapi_token)
     cart_items = cart['data']['attributes']['cart_items']['data']
 
@@ -110,7 +110,7 @@ def clear_cart(cart_id, strapi_token):
 
     for item in cart_items:
         response = requests.delete(
-            f'http://localhost:1337/api/cart-items/{item['id']}',
+            f'{strapi_url}/api/cart-items/{item['id']}',
             headers=headers
         )
         response.raise_for_status()
@@ -118,15 +118,15 @@ def clear_cart(cart_id, strapi_token):
     return True
 
 
-def create_strapi_user(email, chat_id, cart_id, strapi_token):
-    url = 'http://localhost:1337/api/users'
+def create_strapi_user(email, chat_id, cart_id, strapi_token, strapi_url):
+    url = f'{strapi_url}/api/users'
 
     headers = {
         'Authorization': f'Bearer {strapi_token}',
         'Content-Type': 'application/json'
     }
 
-    data = {
+    user_payload = {
         'username': str(chat_id),
         'email': email,
         'password': str(chat_id),
@@ -136,7 +136,7 @@ def create_strapi_user(email, chat_id, cart_id, strapi_token):
         'role': 1
     }
 
-    response = requests.post(url, headers=headers, json=data)
+    response = requests.post(url, headers=headers, json=user_payload)
     response.raise_for_status()
 
     return response.json()
