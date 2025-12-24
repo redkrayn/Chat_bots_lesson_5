@@ -19,6 +19,15 @@ def get_products(strapi_token, strapi_url):
 
 
 def get_or_create_cart(chat_id, strapi_token, strapi_url):
+    carts_data = get_cart(chat_id, strapi_token, strapi_url)
+
+    if carts_data['data']:
+        return carts_data['data'][0]['id']
+    else:
+        return create_cart(chat_id, strapi_token, strapi_url)
+
+
+def get_cart(chat_id, strapi_token, strapi_url):
     headers = {
         'Authorization': f'Bearer {strapi_token}'
     }
@@ -35,28 +44,30 @@ def get_or_create_cart(chat_id, strapi_token, strapi_url):
     )
     response.raise_for_status()
 
-    carts = response.json()
+    return response.json()
 
-    if carts['data']:
-        return carts['data'][0]['id']
 
-    else:
-        cart_payload = {
-            'data': {
-                'chat_id': str(chat_id),
-                'cart_items': []
-            }
+def create_cart(chat_id, strapi_token, strapi_url):
+    headers = {
+        'Authorization': f'Bearer {strapi_token}'
+    }
+
+    cart_payload = {
+        'data': {
+            'chat_id': str(chat_id),
+            'cart_items': []
         }
+    }
 
-        response = requests.post(
-            f'{strapi_url}/api/carts',
-            headers=headers,
-            json=cart_payload
-        )
-        response.raise_for_status()
+    response = requests.post(
+        f'{strapi_url}/api/carts',
+        headers=headers,
+        json=cart_payload
+    )
+    response.raise_for_status()
 
-        cart = response.json()
-        return cart['data']['id']
+    cart = response.json()
+    return cart['data']['id']
 
 
 def add_product_to_cart(cart_id, product_id, strapi_token, strapi_url):
