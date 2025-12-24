@@ -13,14 +13,21 @@ pip install -r requirements.txt
 ```
 
 ## Установка Redis
+#### Windows
 1. Скачайте Redis с [официального сайта](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-windows/)
-
 2. Запустите `redis-server.exe`
 
+#### Linux
+1. `sudo apt install redis-server`
+2. `sudo systemctl start redis`
+
+#### MacOS
+1. `sudo port install redis`
+2. `launchctl load ~/Library/LaunchAgents/homebrew.mxcl.redis.plist`
+
 ## Запуск Strapi
-1. Разархивируйте файл `redkrayn_fish_shop.rar`
-2. `cd /redkrayn_fish_shop` - перейдите в папку
-3. `npm run develop`
+1. Создайте магазин Strapi - [документация](https://docs.strapi.io/cms/installation/cli)
+2. `npm run develop`
 
 ## Настройка переменных окружения
 `STRAPI_TOKEN` - Гайд для получения токена [здесь](https://docs.strapi.io/cms/features/api-tokens#usage)
