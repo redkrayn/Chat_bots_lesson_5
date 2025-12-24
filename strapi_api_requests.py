@@ -24,7 +24,7 @@ def get_or_create_cart(chat_id, strapi_token, strapi_url):
     }
 
     params = {
-        'filters[chat_id][$eq]': str(chat_id),
+        'filters[chat_id][$eq]': chat_id,
         'populate': 'cart_items'
     }
 
